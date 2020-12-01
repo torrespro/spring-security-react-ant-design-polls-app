@@ -11,8 +11,6 @@ create table polls
 	question varchar(255)
 );
 
-alter table polls owner to db;
-
 create table choices
 (
 	id bigserial not null
@@ -24,8 +22,6 @@ create table choices
 			references polls
 );
 
-alter table choices owner to db;
-
 create table roles
 (
 	id bigserial not null
@@ -35,8 +31,6 @@ create table roles
 		constraint uk_nb4h0p6txrmfc0xbrd1kglp9t
 			unique
 );
-
-alter table roles owner to db;
 
 create table users
 (
@@ -55,8 +49,6 @@ create table users
 			unique
 );
 
-alter table users owner to db;
-
 create table user_roles
 (
 	user_id bigint not null
@@ -68,8 +60,6 @@ create table user_roles
 	constraint user_roles_pkey
 		primary key (user_id, role_id)
 );
-
-alter table user_roles owner to db;
 
 create table votes
 (
@@ -91,5 +81,4 @@ create table votes
 		unique (poll_id, user_id)
 );
 
-alter table votes owner to db;
 
