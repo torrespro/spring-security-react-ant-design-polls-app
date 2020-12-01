@@ -1,69 +1,95 @@
-CREATE TABLE `users` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(40) NOT NULL,
-  `username` varchar(15) NOT NULL,
-  `email` varchar(40) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_users_username` (`username`),
-  UNIQUE KEY `uk_users_email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create table polls
+(
+	id bigserial not null
+		constraint polls_pkey
+			primary key,
+	created_at timestamp,
+	updated_at timestamp,
+	created_by bigint,
+	updated_by bigint,
+	expiration_date_time timestamp,
+	question varchar(255)
+);
 
+alter table polls owner to db;
 
-CREATE TABLE `roles` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(60) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_roles_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+create table choices
+(
+	id bigserial not null
+		constraint choices_pkey
+			primary key,
+	text varchar(255),
+	poll_id bigint not null
+		constraint fk1i68hpih40n447wqx4lpef6ot
+			references polls
+);
 
+alter table choices owner to db;
 
-CREATE TABLE `user_roles` (
-  `user_id` bigint(20) NOT NULL,
-  `role_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`user_id`,`role_id`),
-  KEY `fk_user_roles_role_id` (`role_id`),
-  CONSTRAINT `fk_user_roles_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
-  CONSTRAINT `fk_user_roles_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create table roles
+(
+	id bigserial not null
+		constraint roles_pkey
+			primary key,
+	name varchar(60)
+		constraint uk_nb4h0p6txrmfc0xbrd1kglp9t
+			unique
+);
 
+alter table roles owner to db;
 
-CREATE TABLE `polls` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `question` varchar(140) NOT NULL,
-  `expiration_date_time` datetime NOT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `created_by` bigint(20) DEFAULT NULL,
-  `updated_by` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create table users
+(
+	id bigserial not null
+		constraint users_pkey
+			primary key,
+	created_at timestamp,
+	updated_at timestamp,
+	email varchar(255)
+		constraint uk6dotkott2kjsp8vw4d0m25fb7
+			unique,
+	name varchar(255),
+	password varchar(255),
+	username varchar(255)
+		constraint ukr43af9ap4edm43mmtq01oddj6
+			unique
+);
 
+alter table users owner to db;
 
-CREATE TABLE `choices` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `text` varchar(40) NOT NULL,
-  `poll_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_choices_poll_id` (`poll_id`),
-  CONSTRAINT `fk_choices_poll_id` FOREIGN KEY (`poll_id`) REFERENCES `polls` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create table user_roles
+(
+	user_id bigint not null
+		constraint fkhfh9dx7w3ubf1co1vdev94g3f
+			references users,
+	role_id bigint not null
+		constraint fkh8ciramu9cc9q3qcqiv4ue8a6
+			references roles,
+	constraint user_roles_pkey
+		primary key (user_id, role_id)
+);
 
+alter table user_roles owner to db;
 
-CREATE TABLE `votes` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) NOT NULL,
-  `poll_id` bigint(20) NOT NULL,
-  `choice_id` bigint(20) NOT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `fk_votes_user_id` (`user_id`),
-  KEY `fk_votes_poll_id` (`poll_id`),
-  KEY `fk_votes_choice_id` (`choice_id`),
-  CONSTRAINT `fk_votes_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `fk_votes_poll_id` FOREIGN KEY (`poll_id`) REFERENCES `polls` (`id`),
-  CONSTRAINT `fk_votes_choice_id` FOREIGN KEY (`choice_id`) REFERENCES `choices` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create table votes
+(
+	id bigserial not null
+		constraint votes_pkey
+			primary key,
+	created_at timestamp,
+	updated_at timestamp,
+	choice_id bigint not null
+		constraint fkomskymhxde3qq9mcukyp1puio
+			references choices,
+	poll_id bigint not null
+		constraint fk7trt3uyihr4g13hva9d31puxg
+			references polls,
+	user_id bigint not null
+		constraint fkli4uj3ic2vypf5pialchj925e
+			references users,
+	constraint uk8um9h2wxsdjrgx3rjjwvny676
+		unique (poll_id, user_id)
+);
+
+alter table votes owner to db;
+
